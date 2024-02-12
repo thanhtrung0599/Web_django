@@ -14,20 +14,19 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, send_mail
 from django.template import loader
 from django.contrib.auth.hashers import check_password
-from django.contrib.auth.tokens import default_token_generator 
+from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Avg
 # Create your views here.
 
 ## Trang Chủ Start
 def index(request):
     categories = Category.objects.all()
-    types = Loai.objects.all()
-    data_type = []
-    for i in Loai.objects.filter(loai__icontains = 'Laptop'):
-        data_type.append(i.id)
+    types = Loai.objects.only('loai').all()
+    data_type = [i.id for i in Loai.objects.filter(loai__icontains='Laptop')]
     brands = Brand.objects.filter(brand__in=['Dell', 'Asus', 'HP', 'Lenovo', 'Intel', 'AMD'])
-    laptops_sale = Product.objects.filter(loai_id__in = data_type, age_id = 1).order_by('-discount')[:12]
+    laptops_sale = Product.objects.filter(loai_id__in=data_type, age_id=1).order_by('-discount')[:12].prefetch_related('loai', 'brand')
     # Lấy 12 laptop có discount giảm dần
-    laptops_new = Product.objects.filter(loai_id__in = data_type, age_id = 1).order_by('-id')[:12]
+    laptops_new = Product.objects.filter(loai_id__in=data_type, age_id=1).order_by('-id')[:12].prefetch_related('loai', 'brand')
     # Lấy 12 laptop mới được thêm vào
     return render(
         request=request,
@@ -45,7 +44,7 @@ def index(request):
 ## Trang Views Start
 def views(request):
     categories = Category.objects.all()
-    type = Loai.objects.all()
+    types = Loai.objects.only('loai').all()
     brands = Brand.objects.all()
     if request.method == "GET":
         # Lấy giá trị từ khóa 
@@ -78,7 +77,7 @@ def views(request):
                             request=request,
                             template_name= '404.html',
                     )
-            print(list_data)
+
             # Lấy ra các sản phẩm có category id có trong danh sách list_data
             products = Product.objects.filter(category__in = list_data, price__isnull=False)
 
@@ -130,7 +129,7 @@ def views(request):
             template_name= 'views.html',
             context= {
                 'categories': categories,
-                'types': type,
+                'types': types,
                 'products': products,
                 'message': message,
                 'brands': brands,
@@ -141,7 +140,7 @@ def views(request):
 ## Trang Detail Start    
 def detail(request, id):
     categories = Category.objects.all()
-    type = Loai.objects.all()
+    types = Loai.objects.only('loai').all()
 
     # Lấy sản phẩm xem chi tiết
     product = Product.objects.get(id=id)
@@ -166,7 +165,7 @@ def detail(request, id):
         context= {
             'product': product,
             'categories': categories,
-            'types': type,
+            'types': types,
             'images': product.image_set.all(),
             'products_similar': products_similar,
             'reviews': reviews,
@@ -246,7 +245,7 @@ def register(request):
     if request.user.is_authenticated:
         logout(request)
     categories = Category.objects.all()
-    type = Loai.objects.all()
+    types = Loai.objects.only('loai').all()
     form = RegisterForm
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -268,7 +267,7 @@ def register(request):
         template_name= 'register.html',
         context= {
             'categories': categories,
-            'types': type,
+            'types': types,
             'form': form,
         }
         
@@ -405,7 +404,7 @@ def logout_user(request):
 @login_required(login_url='login_user_url')
 def cart(request):
     categories = Category.objects.all()
-    type = Loai.objects.all()
+    types = Loai.objects.only('loai').all()
     sum_price = 0
     order_detail =""
     message = ""
@@ -421,7 +420,9 @@ def cart(request):
         if order_detail:
             for product in order_detail:
                 sum_price+=product.money
-
+        else:
+            order = ""
+            message = "Chưa Có Đơn Hàng Nào"
     except Order.DoesNotExist:
         order = ""
         message = "Chưa Có Đơn Hàng Nào"
@@ -432,7 +433,7 @@ def cart(request):
         context= {
             'order_detail': order_detail,
             'categories': categories,
-            'types': type,
+            'types': types,
             'total':sum_price,
             'message': message,
         }
@@ -477,9 +478,9 @@ def add_count_product(request):
             discount = 0
 
         # Thêm số lượng, giá mới vào DB
-        order.soluong = count
-        order.money = (product.price*(100-discount)/100)*count
-        order.save()
+        order_detail.soluong = count
+        order_detail.money = (product.price*(100-discount)/100)*count
+        order_detail.save()
         return JsonResponse({
             'message': 'Thay Đổi Số Lượng'
         }, status = 200)
@@ -493,7 +494,7 @@ def add_count_product(request):
 @login_required(login_url='login_user_url')
 def checkout(request):
     categories = Category.objects.all()
-    type = Loai.objects.all()
+    types = Loai.objects.only('loai').all()
     user = User.objects.get(username=request.user)
     order_detail = ""
     sum_price = 0
@@ -536,7 +537,7 @@ def checkout(request):
             context= {
                 'order_detail': order_detail,
                 'categories': categories,
-                'types': type,
+                'types': types,
                 'total':sum_price,
                 'form': form,
                 'form_info': form_info,
@@ -755,7 +756,7 @@ def detail_order(request,id):
     if request.user.is_authenticated:
         if request.method == 'GET':
             user = User.objects.get(username = request.user)
-            order_detail = Chitietdonhang.objects.filter(order_id = id)
+            order_detail = Chitietdonhang.objects.filter(order_id = id, user = user)
         if not order_detail:
             message = "Chưa Có Đơn Hàng Nào"
 

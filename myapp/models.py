@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from datetime import datetime, timedelta
 class Category(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, db_index=True)
     category_parent = models.ForeignKey(
         to='self',
         blank=True,
@@ -28,7 +28,7 @@ class Discount(models.Model):
         db_table = 'Discount'
 
 class Loai(models.Model):
-    loai = models.CharField(max_length=255)
+    loai = models.CharField(max_length=255, db_index=True)
     def __str__(self):
         return f'{self.loai}'
     class Meta:
@@ -42,7 +42,7 @@ class Age(models.Model):
         db_table = 'Age'
 
 class Brand(models.Model):
-    brand = models.CharField(max_length=30)
+    brand = models.CharField(max_length=30, db_index=True)
     image = models.CharField(max_length=255, null=True, blank=True)
     def __str__(self):
         return f'{self.brand}'
@@ -57,7 +57,7 @@ class Detail(models.Model):
         db_table = 'detail'
 
 class Product(models.Model):
-    name = models.CharField(max_length=255, unique= True)
+    name = models.CharField(max_length=255, unique= True, db_index=True)
     description = models.TextField(null=True, blank=True)
     loai = models.ForeignKey(to = Loai, on_delete= models.CASCADE, null=True, blank=True)
     age = models.ForeignKey(to = Age, on_delete= models.CASCADE, null=True, blank=True)
@@ -73,15 +73,15 @@ class Product(models.Model):
         db_table = 'Product'
 
 class Image(models.Model):
-    product = models.ForeignKey(to = Product, on_delete= models.CASCADE)
-    image = models.CharField(max_length=255, null=True, blank=True)
+    product = models.ForeignKey(to = Product, on_delete= models.CASCADE, db_index=True)
+    image = models.CharField(max_length=255, null=True, blank=True, db_index=True)
     def __str__(self):
         return f'{self.product}'
     class Meta:
         db_table = 'Image'
 
 class Card(models.Model):
-    product = models.OneToOneField(to = Product, on_delete= models.CASCADE)
+    product = models.OneToOneField(to = Product, on_delete= models.CASCADE, db_index=True)
     chip = models.CharField(max_length=30, null=True, blank=True)
     memory = models.CharField(max_length=30, null=True, blank=True)
     connector = models.CharField(max_length=30, null=True, blank=True)
@@ -101,7 +101,7 @@ class Card(models.Model):
             }
 
 class CPU(models.Model):
-    product = models.OneToOneField(to = Product, on_delete= models.CASCADE)
+    product = models.OneToOneField(to = Product, on_delete= models.CASCADE, db_index=True)
     socket = models.CharField(max_length=30, null=True, blank=True)
     core = models.CharField(max_length=30, null=True, blank=True)
     speed = models.CharField(max_length=30, null=True, blank=True)
@@ -123,7 +123,7 @@ class CPU(models.Model):
             }
 
 class RAM(models.Model):
-    product = models.OneToOneField(to = Product, on_delete= models.CASCADE)
+    product = models.OneToOneField(to = Product, on_delete= models.CASCADE, db_index=True)
     standram = models.CharField(max_length=30, null=True, blank=True)
     capacity = models.CharField(max_length=30, null=True, blank=True)
     speed = models.CharField(max_length=30, null=True, blank=True)
@@ -140,7 +140,7 @@ class RAM(models.Model):
             }
 
 class Harddrive(models.Model):
-    product = models.OneToOneField(to = Product, on_delete= models.CASCADE)
+    product = models.OneToOneField(to = Product, on_delete= models.CASCADE, db_index=True)
     loai = models.CharField(max_length=30, null=True, blank=True)
     standard = models.CharField(max_length=30, null=True, blank=True)
     size = models.CharField(max_length=30, null=True, blank=True)
@@ -159,7 +159,7 @@ class Harddrive(models.Model):
             }
 
 class ManHinh(models.Model):
-    product = models.OneToOneField(to = Product, on_delete= models.CASCADE)
+    product = models.OneToOneField(to = Product, on_delete= models.CASCADE, db_index=True)
     size = models.CharField(max_length=30, null=True, blank=True)
     resolution = models.CharField(max_length=30, null=True, blank=True)
     panels = models.CharField(max_length=30, null=True, blank=True)
@@ -179,7 +179,7 @@ class ManHinh(models.Model):
             'Cổng kết nối:':self.connector}
 
 class Laptop(models.Model):
-    product = models.OneToOneField(to = Product, on_delete= models.CASCADE)
+    product = models.OneToOneField(to = Product, on_delete= models.CASCADE, db_index=True)
     cpu = models.ForeignKey(to = CPU, on_delete= models.CASCADE, null=True, blank=True)
     ram = models.ForeignKey(to = RAM, on_delete= models.CASCADE, null=True, blank=True)
     harddrive = models.ForeignKey(to = Harddrive, on_delete= models.CASCADE, null=True, blank=True)
@@ -233,7 +233,7 @@ class PhuongXa(models.Model):
         ordering = ['pk']
 
 class User(AbstractUser):
-    username = models.CharField(max_length=255, unique=True)
+    username = models.CharField(max_length=255, unique=True, db_index=True)
     password = models.CharField(max_length=255)
     fullname = models.CharField(max_length=100)
     ngaysinh = models.DateField(null=True)
@@ -251,14 +251,14 @@ class User(AbstractUser):
 class Feedback(models.Model):
     content = models.TextField()
     user = models.ForeignKey(to = User, on_delete= models.CASCADE, null=True, blank=True)
-    product = models.ForeignKey(to = Product, on_delete= models.DO_NOTHING, null=True, blank=True)
+    product = models.ForeignKey(to = Product, on_delete= models.DO_NOTHING, null=True, blank=True, db_index=True)
     vote = models.IntegerField(null=True, blank=True)
     date = models.DateTimeField(null=True, blank=True)
     class Meta:
         db_table = 'Feedback'
 
 class Status(models.Model):
-    status = models.CharField(max_length=40)
+    status = models.CharField(max_length=40, db_index=True)
     def __str__(self):
         return f'{self.id, self.status}'
     class Meta:
@@ -267,14 +267,14 @@ class Status(models.Model):
 class Order(models.Model):
     date = models.DateTimeField(null=True, blank=True)
     status = models.ForeignKey(to = Status, on_delete= models.CASCADE, null=True, blank=True)
-    user = models.ForeignKey(to = User, on_delete= models.CASCADE)
+    user = models.ForeignKey(to = User, on_delete= models.CASCADE, db_index=True)
     def __str__(self):
         return f'Đơn {self.user} {self.date} {self.id}'
     class Meta:
         db_table = 'Order'
 
 class Chitietdonhang(models.Model):
-    order = models.ForeignKey(to = Order, on_delete= models.CASCADE)
+    order = models.ForeignKey(to = Order, on_delete= models.CASCADE, db_index=True)
     product = models.ForeignKey(to = Product, on_delete= models.CASCADE)
     soluong = models.IntegerField(null=True, blank=True)
     money = models.IntegerField(null=True, blank=True)
