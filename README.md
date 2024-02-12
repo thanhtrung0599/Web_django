@@ -9,7 +9,10 @@
 ### + CRUD user, sản phẩm với Admin
 ## User:
 ### + Tạo đơn hàng
-### + Đăng nhập, đăng xuât User
+### + Tạo đơn hàng
 ### + Thay đổi mật khẩu, reset mật khẩu
 ## Link Github: https://github.com/thanhtrung0599/Web_django.git
 ## Link Web: https://thanhtrung0599.pythonanywhere.com/
+## Contact:
+### + Gmail: thanhtrung0599@gmail.com
+### + Phone: 0325372849
