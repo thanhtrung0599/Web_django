@@ -5,11 +5,11 @@
 ### + Database: Sqlite3, MySQL
 ## Sử dụng template: https://themewagon.com/themes
 ## Mô tả chức năng:
-## + Admin:
+## Admin:
 ### + CRUD user, sản phẩm với Admin
-## + User:
+## User:
 ### + Tạo đơn hàng
 ### + Đăng nhập, đăng xuât User
 ### + Thay đổi mật khẩu, reset mật khẩu
-##Link Github: https://github.com/thanhtrung0599/Web_django.git
+## Link Github: https://github.com/thanhtrung0599/Web_django.git
 ## Link Web: https://thanhtrung0599.pythonanywhere.com/
