@@ -11,5 +11,5 @@
 ### + Tạo đơn hàng
 ### + Đăng nhập, đăng xuât User
 ### + Thay đổi mật khẩu, reset mật khẩu
-Link Github: https://github.com/thanhtrung0599/Web_django.git
-Link Web: https://thanhtrung0599.pythonanywhere.com/
+##Link Github: https://github.com/thanhtrung0599/Web_django.git
+## Link Web: https://thanhtrung0599.pythonanywhere.com/
