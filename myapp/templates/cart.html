@@ -182,17 +182,17 @@ Card {{user.fullname}}
 
                     // Thay đổi tiền theo số lượng từng sản phẩm thay đổi
                     money_one = $(this).parent().parent().parent().parent().find($('td.money_one')).text()
-                    money_one = parseInt(money_one.slice(0, -2).split('.').join(''))
+                    money_one = parseInt(money_one.slice(1).split(',').join(''))
                     price_products = money_one*newVal
                     money_all = parseInt(price_products).toLocaleString('vn-VN', {style : 'currency', currency : 'VND'});
                     $(this).parent().parent().parent().parent().find($('td.money_total')).text(money_all)
-                    button.parent().parent().find('input').val(newVal);      
+                    button.parent().parent().find('input').val(newVal);    
                 }
 
                 // Thay đổi số tiền tổng nếu thay đổi số lượng sản phẩm start
                 var total = 0
                 $('.money_total').each(function(){
-                    total+=parseInt($(this).text().slice(0, -2).split('.').join(''))
+                    total+=parseInt($(this).text().slice(1).split(',').join(''))
                 })
                 
                 var all_ship = total

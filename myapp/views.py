@@ -811,6 +811,7 @@ def forgot_password(request):
             email_form = settings.EMAIL_HOST_USER
             recipient_list = [email,]
             try:
+    
                 send_mail(subject, message, email_form, recipient_list)
                 return redirect('confirm_token_password_url')
             except BadHeaderError:
@@ -839,9 +840,10 @@ def confirm_token(request):
         form = TokenPasswordForm(request.POST)
         if form.is_valid():
             form.save()
-            return JsonResponse({
-                'message': f'Đặt Mật Khẩu Mới Thành Công'
-            }, status = 200)
+            return redirect("login_user_url")
+            # return JsonResponse({
+            #     'message': f'Đặt Mật Khẩu Mới Thành Công'
+            # }, status = 200)
         else:
             return render(
                 request=request,
